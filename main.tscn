@@ -1,0 +1,66 @@
+[gd_scene load_steps=10 format=3 uid="uid://dy7f4do55h5es"]
+
+[ext_resource type="Script" uid="uid://dnrxurf0kkigd" path="res://main.gd" id="1_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://b3eu2i68dw28i" path="res://mob.tscn" id="2_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://c3ga8vfm4aacv" path="res://player.tscn" id="2_h2yge"]
+[ext_resource type="PackedScene" uid="uid://g6mu7nv71yrf" path="res://berries.tscn" id="3_1bvp3"]
+[ext_resource type="Texture2D" uid="uid://cfnrcqt05wua8" path="res://art/background.png" id="5_lquwl"]
+[ext_resource type="PackedScene" uid="uid://c3qmus8byb6te" path="res://hud.tscn" id="6_7mycd"]
+[ext_resource type="AudioStream" uid="uid://wtadftvftuws" path="res://art/Galactic Eterna Building.ogg" id="7_5vw27"]
+[ext_resource type="AudioStream" uid="uid://ccbxu7jb3l76w" path="res://art/ARC_BTL_CMN_Expl_BB.ogg" id="7_272bh"]
+
+[sub_resource type="Curve2D" id="Curve2D_1bvp3"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 1152, 0, 0, 0, 0, 0, 1152, 648, 0, 0, 0, 0, 0, 648, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1152, 0)
+}
+point_count = 5
+
+[node name="Main" type="Node"]
+script = ExtResource("1_0xm2m")
+mob_scene = ExtResource("2_1bvp3")
+berry_scene = ExtResource("3_1bvp3")
+
+[node name="Player" parent="." instance=ExtResource("2_h2yge")]
+
+[node name="MobTimer" type="Timer" parent="."]
+wait_time = 0.284
+
+[node name="ScoreTimer" type="Timer" parent="."]
+
+[node name="StartTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="StartPosition" type="Marker2D" parent="."]
+position = Vector2(200, 200)
+
+[node name="MobPath" type="Path2D" parent="."]
+curve = SubResource("Curve2D_1bvp3")
+
+[node name="MobSpawnLocation" type="PathFollow2D" parent="MobPath"]
+position = Vector2(1152, 0)
+rotation = 1.5708
+
+[node name="TextureRect" type="TextureRect" parent="."]
+z_index = -100
+offset_left = -8.0
+offset_top = -48.0
+offset_right = 2712.0
+offset_bottom = 1942.0
+scale = Vector2(0.44, 0.44)
+texture = ExtResource("5_lquwl")
+
+[node name="HUD" parent="." instance=ExtResource("6_7mycd")]
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_5vw27")
+parameters/looping = true
+
+[node name="DeathSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_272bh")
+
+[connection signal="hit" from="Player" to="." method="game_over"]
+[connection signal="timeout" from="MobTimer" to="." method="_on_mob_timer_timeout"]
+[connection signal="timeout" from="ScoreTimer" to="." method="_on_score_timer_timeout"]
+[connection signal="timeout" from="StartTimer" to="." method="_on_start_timer_timeout"]
+[connection signal="start_game" from="HUD" to="." method="new_game"]
